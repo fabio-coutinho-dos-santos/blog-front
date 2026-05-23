@@ -1,12 +1,16 @@
+'use client'
+
 import siteMetadata from '@/data/siteMetadata'
 import headerNavLinks from '@/data/headerNavLinks'
-import Logo from '@/data/logo.svg'
 import Link from './Link'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import SearchButton from './SearchButton'
+import Image from './Image'
+import { useAuth } from 'app/context/auth-context'
 
 const Header = () => {
+  const { isAuthenticated } = useAuth()
   let headerClass = 'flex items-center w-full bg-white dark:bg-gray-950 justify-between py-10'
   if (siteMetadata.stickyNav) {
     headerClass += ' sticky top-0 z-50'
@@ -17,11 +21,20 @@ const Header = () => {
       <Link href="/" aria-label={siteMetadata.headerTitle}>
         <div className="flex items-center justify-between">
           <div className="mr-3">
-            <Logo />
+            <Image
+              src="https://r2-cdn.procode-tech.com/images/avatar-photo.png"
+              alt="Fabio Coutinho logo"
+              width={44}
+              height={44}
+              className="rounded-full object-cover"
+            />
           </div>
           {typeof siteMetadata.headerTitle === 'string' ? (
-            <div className="hidden h-6 text-2xl font-semibold sm:block">
-              {siteMetadata.headerTitle}
+            <div className="hidden sm:block">
+              <div className="h-6 text-2xl font-semibold">{siteMetadata.headerTitle}</div>
+              <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                Senior Software Engineer
+              </div>
             </div>
           ) : (
             siteMetadata.headerTitle
@@ -41,6 +54,14 @@ const Header = () => {
                 {link.title}
               </Link>
             ))}
+          {isAuthenticated && (
+            <Link
+              href="/admin/new-post"
+              className="hover:text-primary-500 dark:hover:text-primary-400 m-1 font-medium text-gray-900 dark:text-gray-100"
+            >
+              New Post
+            </Link>
+          )}
         </div>
         <SearchButton />
         <ThemeSwitch />

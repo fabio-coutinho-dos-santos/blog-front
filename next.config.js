@@ -84,6 +84,10 @@ module.exports = () => {
           protocol: 'https',
           hostname: 'picsum.photos',
         },
+        {
+          protocol: 'https',
+          hostname: 'r2-cdn.procode-tech.com',
+        },
       ],
       unoptimized,
     },

@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@plugin "@tailwindcss/forms";
+@plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 @source '../node_modules/pliny';
 @custom-variant dark (&:where(.dark, .dark *));
@@ -7,22 +7,23 @@
 /* Core theme configuration */
 @theme {
   /* Font families */
-  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+  --font-sans:
+    var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
   /* Colors */
   /* Copied from https://tailwindcss.com/docs/theme#default-theme-variable-reference */
-  --color-primary-50: oklch(0.971 0.014 343.198);
-  --color-primary-100: oklch(0.948 0.028 342.258);
-  --color-primary-200: oklch(0.899 0.061 343.231);
-  --color-primary-300: oklch(0.823 0.12 346.018);
-  --color-primary-400: oklch(0.718 0.202 349.761);
-  --color-primary-500: oklch(0.656 0.241 354.308);
-  --color-primary-600: oklch(0.592 0.249 0.584);
-  --color-primary-700: oklch(0.525 0.223 3.958);
-  --color-primary-800: oklch(0.459 0.187 3.815);
-  --color-primary-900: oklch(0.408 0.153 2.432);
-  --color-primary-950: oklch(0.284 0.109 3.907);
+  --color-primary-50: oklch(0.98 0.013 214.2);
+  --color-primary-100: oklch(0.95 0.03 219.1);
+  --color-primary-200: oklch(0.9 0.06 224.3);
+  --color-primary-300: oklch(0.84 0.11 229.4);
+  --color-primary-400: oklch(0.77 0.15 233.2);
+  --color-primary-500: oklch(0.7 0.17 236.9);
+  --color-primary-600: oklch(0.61 0.16 239.8);
+  --color-primary-700: oklch(0.53 0.14 242.6);
+  --color-primary-800: oklch(0.45 0.12 244.7);
+  --color-primary-900: oklch(0.39 0.1 246.2);
+  --color-primary-950: oklch(0.29 0.08 248.1);
 
   --color-gray-50: oklch(0.985 0.002 247.839);
   --color-gray-100: oklch(0.967 0.003 264.542);
@@ -99,6 +100,42 @@
     & :where(code):not(pre code) {
       color: var(--color-indigo-500);
     }
+    & .code-block {
+      margin-top: 1.25rem;
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--color-gray-300);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, var(--color-gray-100), var(--color-gray-50));
+      overflow: hidden;
+    }
+    & .code-lang {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.65rem;
+      color: var(--color-gray-700);
+      background-color: var(--color-gray-200);
+      border-bottom: 1px solid var(--color-gray-300);
+    }
+    & pre {
+      margin: 0;
+      background: transparent;
+      border-radius: 0;
+      padding: 1rem 1rem 1.1rem;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+    & pre code {
+      color: var(--color-gray-900);
+      background: transparent;
+      padding: 0;
+      font-size: inherit;
+      font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+        monospace;
+    }
   }
 
   .prose-invert {
@@ -112,6 +149,18 @@
       }
     }
     & :where(h1, h2, h3, h4, h5, h6) {
+      color: var(--color-gray-100);
+    }
+    & .code-block {
+      border: 1px solid var(--color-gray-700);
+      background: linear-gradient(180deg, #0f172a, #020617);
+    }
+    & .code-lang {
+      color: var(--color-gray-300);
+      background-color: #111827;
+      border-bottom: 1px solid var(--color-gray-700);
+    }
+    & pre code {
       color: var(--color-gray-100);
     }
   }
