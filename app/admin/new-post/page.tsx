@@ -12,7 +12,6 @@ export default function NewPostPage() {
   const [title, setTitle] = useState('')
   const [subtitle, setSubtitle] = useState('')
   const [content, setContent] = useState('')
-  const [tags, setTags] = useState('')
   const [image, setImage] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -28,11 +27,11 @@ export default function NewPostPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!accessToken) {
-      setError('Missing access token. Please login again.')
+      setError('Token de acesso ausente. Faça login novamente.')
       return
     }
     if (!image) {
-      setError('Image is required.')
+      setError('Imagem obrigatória.')
       return
     }
 
@@ -45,7 +44,6 @@ export default function NewPostPage() {
       formData.append('title', title)
       formData.append('subtitle', subtitle)
       formData.append('content', content)
-      formData.append('tags', tags)
       formData.append('image', image)
 
       const response = await fetch('/api/posts', {
@@ -59,14 +57,14 @@ export default function NewPostPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data?.error || 'Could not create post.')
+        setError(data?.error || 'Não foi possível criar o post.')
         return
       }
 
-      setSuccess('Post created successfully. Redirecting...')
+      setSuccess('Post criado com sucesso. Redirecionando...')
       router.push('/')
     } catch {
-      setError('Could not connect to API.')
+      setError('Não foi possível conectar à API.')
     } finally {
       setLoading(false)
     }
@@ -77,12 +75,14 @@ export default function NewPostPage() {
   return (
     <div className="mx-auto max-w-3xl py-10">
       <div className="from-primary-100 to-primary-50 dark:from-primary-500/20 dark:to-primary-600/5 mb-6 rounded-2xl border border-gray-200 bg-gradient-to-br p-6 dark:border-gray-800">
-        <p className="text-primary-400 text-sm font-semibold tracking-wide uppercase">Admin Area</p>
+        <p className="text-primary-400 text-sm font-semibold tracking-wide uppercase">
+          Área Administrativa
+        </p>
         <h1 className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
-          Create New Post
+          Criar Novo Post
         </h1>
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          Write, upload image, and publish your article.
+          Escreva, envie a imagem e publique seu artigo.
         </p>
       </div>
       <form
@@ -94,7 +94,7 @@ export default function NewPostPage() {
             htmlFor="title"
             className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
           >
-            Title
+            Título
           </label>
           <input
             id="title"
@@ -110,7 +110,7 @@ export default function NewPostPage() {
             htmlFor="subtitle"
             className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
           >
-            Subtitle
+            Subtítulo
           </label>
           <input
             id="subtitle"
@@ -123,27 +123,10 @@ export default function NewPostPage() {
         </div>
         <div>
           <label
-            htmlFor="tags"
-            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
-          >
-            Tags (comma-separated)
-          </label>
-          <input
-            id="tags"
-            type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            required
-            placeholder="go,api,gin"
-            className="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-500"
-          />
-        </div>
-        <div>
-          <label
             htmlFor="content"
             className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
           >
-            Content
+            Conteúdo
           </label>
           <textarea
             id="content"
@@ -152,21 +135,21 @@ export default function NewPostPage() {
             required
             rows={14}
             className="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 font-mono text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-500"
-            placeholder="Write your post content..."
+            placeholder="Escreva o conteúdo do seu post..."
           />
           <button
             type="button"
             onClick={() => setShowPreview((prev) => !prev)}
             className="text-primary-400 hover:text-primary-300 mt-2 text-sm font-medium"
           >
-            {showPreview ? 'Hide preview' : 'Show preview'}
+            {showPreview ? 'Ocultar prévia' : 'Mostrar prévia'}
           </button>
         </div>
 
         {showPreview && (
           <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950">
             <p className="mb-3 text-sm font-semibold tracking-wide text-gray-600 uppercase dark:text-gray-300">
-              Preview
+              Prévia
             </p>
             <article className="prose dark:prose-invert max-w-none">
               <div dangerouslySetInnerHTML={{ __html: formatRichContent(content) }} />
@@ -178,7 +161,7 @@ export default function NewPostPage() {
             htmlFor="image"
             className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
           >
-            Image (png, jpg, jpeg - max 1MB)
+            Imagem (png, jpg, jpeg - máx. 1MB)
           </label>
           <input
             id="image"
@@ -204,7 +187,7 @@ export default function NewPostPage() {
           disabled={loading}
           className="bg-primary-500 hover:bg-primary-600 w-full rounded-lg px-4 py-2 font-semibold text-white transition-colors disabled:opacity-60"
         >
-          {loading ? 'Publishing...' : 'Publish Post'}
+          {loading ? 'Publicando...' : 'Publicar Post'}
         </button>
       </form>
     </div>

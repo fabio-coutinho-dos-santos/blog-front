@@ -40,7 +40,10 @@ export async function POST(request: NextRequest) {
 
     return await toNextResponse(response)
   } catch {
-    return NextResponse.json({ error: 'Could not connect to backend API.' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Não foi possível conectar à API de backend.' },
+      { status: 500 }
+    )
   }
 }
 
@@ -52,7 +55,7 @@ export async function PUT(request: NextRequest) {
     const contentType = request.headers.get('content-type') || ''
 
     if (!postId) {
-      return NextResponse.json({ error: 'Missing postId query param.' }, { status: 400 })
+      return NextResponse.json({ error: 'Parâmetro postId ausente na consulta.' }, { status: 400 })
     }
 
     let response: Response
@@ -80,7 +83,10 @@ export async function PUT(request: NextRequest) {
 
     return await toNextResponse(response)
   } catch {
-    return NextResponse.json({ error: 'Could not connect to backend API.' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Não foi possível conectar à API de backend.' },
+      { status: 500 }
+    )
   }
 }
 
@@ -90,7 +96,7 @@ export async function DELETE(request: NextRequest) {
     const postId = url.searchParams.get('postId')
     const authHeader = request.headers.get('authorization') || ''
     if (!postId) {
-      return NextResponse.json({ error: 'Missing postId query param.' }, { status: 400 })
+      return NextResponse.json({ error: 'Parâmetro postId ausente na consulta.' }, { status: 400 })
     }
 
     const response = await fetch(`${API_BASE_URL}/api/v1/posts/${postId}`, {
@@ -103,6 +109,9 @@ export async function DELETE(request: NextRequest) {
 
     return await toNextResponse(response)
   } catch {
-    return NextResponse.json({ error: 'Could not connect to backend API.' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Não foi possível conectar à API de backend.' },
+      { status: 500 }
+    )
   }
 }

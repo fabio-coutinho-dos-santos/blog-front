@@ -30,14 +30,14 @@ export default function LoginPage() {
       const data = await response.json()
 
       if (!response.ok || !data?.access_token) {
-        setError(data?.error || 'Invalid credentials')
+        setError(data?.error || 'Credenciais inválidas')
         return
       }
 
       login(data.access_token)
       router.push('/admin/new-post')
     } catch {
-      setError('Could not connect to API.')
+      setError('Não foi possível conectar à API.')
     } finally {
       setLoading(false)
     }
@@ -46,10 +46,12 @@ export default function LoginPage() {
   return (
     <div className="mx-auto max-w-md py-14">
       <div className="from-primary-100 to-primary-50 dark:from-primary-500/20 dark:to-primary-600/5 mb-6 rounded-2xl border border-gray-200 bg-gradient-to-br p-6 dark:border-gray-800">
-        <p className="text-primary-400 text-sm font-semibold tracking-wide uppercase">Admin Area</p>
-        <h1 className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">Login</h1>
+        <p className="text-primary-400 text-sm font-semibold tracking-wide uppercase">
+          Área Administrativa
+        </p>
+        <h1 className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">Entrar</h1>
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          Authenticate to create and publish new posts.
+          Faça autenticação para criar e publicar novos posts.
         </p>
       </div>
 
@@ -79,7 +81,7 @@ export default function LoginPage() {
             htmlFor="password"
             className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
           >
-            Password
+            Senha
           </label>
           <input
             id="password"
@@ -88,7 +90,7 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             className="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-500"
-            placeholder="Your password"
+            placeholder="Sua senha"
           />
         </div>
         {error && (
@@ -101,11 +103,11 @@ export default function LoginPage() {
           disabled={loading}
           className="bg-primary-500 hover:bg-primary-600 w-full rounded-lg px-4 py-2 font-semibold text-white transition-colors disabled:opacity-60"
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? 'Entrando...' : 'Entrar'}
         </button>
         {isAuthenticated && (
           <p className="rounded-md bg-green-500/10 p-2 text-sm text-green-700 dark:text-green-300">
-            You are logged in. Redirecting is available.
+            Você está autenticado. O redirecionamento está disponível.
           </p>
         )}
       </form>

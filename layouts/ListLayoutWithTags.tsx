@@ -35,7 +35,7 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
       <nav className="flex justify-between">
         {!prevPage && (
           <button className="cursor-auto disabled:opacity-50" disabled={!prevPage}>
-            Previous
+            Anterior
           </button>
         )}
         {prevPage && (
@@ -43,20 +43,20 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
             href={currentPage - 1 === 1 ? `/${basePath}/` : `/${basePath}/page/${currentPage - 1}`}
             rel="prev"
           >
-            Previous
+            Anterior
           </Link>
         )}
         <span>
-          {currentPage} of {totalPages}
+          {currentPage} de {totalPages}
         </span>
         {!nextPage && (
           <button className="cursor-auto disabled:opacity-50" disabled={!nextPage}>
-            Next
+            Próxima
           </button>
         )}
         {nextPage && (
           <Link href={`/${basePath}/page/${currentPage + 1}`} rel="next">
-            Next
+            Próxima
           </Link>
         )}
       </nav>
@@ -145,109 +145,123 @@ export default function ListLayoutWithTags({
             {title}
           </h1>
         </div>
-        <div className="flex sm:space-x-24">
-          <div className="hidden h-full max-h-screen max-w-[280px] min-w-[280px] flex-wrap overflow-auto rounded-sm bg-gray-50 pt-5 shadow-md sm:flex dark:bg-gray-900/70 dark:shadow-gray-800/40">
-            <div className="px-6 py-4">
+        <div className="w-full">
+          {isFiltering && (
+            <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">Filtrando posts...</p>
+          )}
+          <ul className="divide-y divide-gray-200 dark:divide-gray-800">
+            {displayPosts.map((post) => {
+              const { id, path, date, title, summary, imagePath } = post
+              const imageUrl = buildR2ImageUrl(imagePath)
+              return (
+                <li key={id} className="py-8">
+                  <article className="grid grid-cols-1 gap-6 sm:grid-cols-[minmax(0,1fr)_400px] sm:items-center">
+                    <div className="space-y-4">
+                      <dl>
+                        <dt className="sr-only">Publicado em</dt>
+                        <dd className="text-base leading-6 font-medium text-gray-500 dark:text-gray-400">
+                          <time dateTime={date} suppressHydrationWarning>
+                            {formatDate(date, siteMetadata.locale)}
+                          </time>
+                        </dd>
+                      </dl>
+                      <div>
+                        <h2 className="text-2xl leading-8 font-bold tracking-tight">
+                          {path ? (
+                            <Link href={`/${path}`} className="text-gray-900 dark:text-gray-100">
+                              {title}
+                            </Link>
+                          ) : (
+                            <span className="text-gray-900 dark:text-gray-100">{title}</span>
+                          )}
+                        </h2>
+                        {isAuthenticated && pathname.startsWith('/blog') && (
+                          <div className="mt-3">
+                            <Link
+                              href={`/admin/manage-posts?postId=${id}`}
+                              className="bg-primary-500 hover:bg-primary-600 inline-flex rounded-md px-3 py-1.5 text-xs font-semibold text-white"
+                            >
+                              Editar Post
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                      <div className="prose max-w-none text-lg leading-8 text-gray-500 dark:text-gray-400">
+                        {summary}
+                      </div>
+                      {!!post.tags?.length && (
+                        <footer className="flex flex-wrap items-center gap-2 pt-2">
+                          {post.tags.map((tag) => (
+                            <button
+                              key={`${id}-${tag}`}
+                              type="button"
+                              onClick={() => filterByTag(tag)}
+                              className="text-primary-500 hover:bg-primary-500/10 rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold tracking-wide uppercase transition-colors dark:border-gray-700"
+                              aria-label={`Filter posts by ${tag}`}
+                            >
+                              {tag}
+                            </button>
+                          ))}
+                        </footer>
+                      )}
+                    </div>
+                    {imageUrl && (
+                      <div className="sm:justify-self-end">
+                        <Image
+                          src={imageUrl}
+                          alt={title}
+                          width={400}
+                          height={240}
+                          className="h-[240px] w-full max-w-[400px] rounded-lg object-cover shadow-sm"
+                        />
+                      </div>
+                    )}
+                  </article>
+                </li>
+              )
+            })}
+          </ul>
+          {pagination && pagination.totalPages > 1 && !filteredPosts && (
+            <Pagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} />
+          )}
+
+          <div className="mt-10 rounded-sm bg-gray-50 p-5 shadow-md dark:bg-gray-900/70 dark:shadow-gray-800/40">
+            <div className="mb-4">
               {activeTag ? (
                 <button
                   onClick={clearTagFilter}
                   className="hover:text-primary-500 dark:hover:text-primary-500 cursor-pointer font-bold text-gray-700 uppercase dark:text-gray-300"
                 >
-                  All Posts
+                  Todos os Posts
                 </button>
               ) : (
-                <h3 className="text-primary-500 font-bold uppercase">All Posts</h3>
+                <h3 className="text-primary-500 font-bold uppercase">Todos os Posts</h3>
               )}
-              <ul>
-                {sortedTags.map((t) => {
-                  const selected =
-                    activeTag === t || decodeURI(pathname.split('/tags/')[1] || '') === slug(t)
-                  return (
-                    <li key={t} className="my-3">
-                      {selected ? (
-                        <h3 className="text-primary-500 inline px-3 py-2 text-sm font-bold uppercase">
-                          {`${t} (${tagCounts[t]})`}
-                        </h3>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => filterByTag(t)}
-                          className="hover:text-primary-500 dark:hover:text-primary-500 cursor-pointer px-3 py-2 text-sm font-medium text-gray-500 uppercase dark:text-gray-300"
-                          aria-label={`Filter posts by ${t}`}
-                        >
-                          {`${t} (${tagCounts[t]})`}
-                        </button>
-                      )}
-                    </li>
-                  )
-                })}
-              </ul>
             </div>
-          </div>
-          <div>
-            {isFiltering && (
-              <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">Filtering posts...</p>
-            )}
-            <ul className="divide-y divide-gray-200 dark:divide-gray-800">
-              {displayPosts.map((post) => {
-                const { id, path, date, title, summary, imagePath } = post
-                const imageUrl = buildR2ImageUrl(imagePath)
+            <ul className="flex flex-wrap gap-2">
+              {sortedTags.map((t) => {
+                const selected =
+                  activeTag === t || decodeURI(pathname.split('/tags/')[1] || '') === slug(t)
                 return (
-                  <li key={id} className="py-6">
-                    <article className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_220px] sm:items-center">
-                      <div className="space-y-3">
-                        <dl>
-                          <dt className="sr-only">Published on</dt>
-                          <dd className="text-base leading-6 font-medium text-gray-500 dark:text-gray-400">
-                            <time dateTime={date} suppressHydrationWarning>
-                              {formatDate(date, siteMetadata.locale)}
-                            </time>
-                          </dd>
-                        </dl>
-                        <div>
-                          <h2 className="text-2xl leading-8 font-bold tracking-tight">
-                            {path ? (
-                              <Link href={`/${path}`} className="text-gray-900 dark:text-gray-100">
-                                {title}
-                              </Link>
-                            ) : (
-                              <span className="text-gray-900 dark:text-gray-100">{title}</span>
-                            )}
-                          </h2>
-                          {isAuthenticated && pathname.startsWith('/blog') && (
-                            <div className="mt-3">
-                              <Link
-                                href={`/admin/manage-posts?postId=${id}`}
-                                className="bg-primary-500 hover:bg-primary-600 inline-flex rounded-md px-3 py-1.5 text-xs font-semibold text-white"
-                              >
-                                Edit Post
-                              </Link>
-                            </div>
-                          )}
-                        </div>
-                        <div className="prose max-w-none text-gray-500 dark:text-gray-400">
-                          {summary}
-                        </div>
-                      </div>
-                      {imageUrl && (
-                        <div className="sm:justify-self-end">
-                          <Image
-                            src={imageUrl}
-                            alt={title}
-                            width={220}
-                            height={130}
-                            className="h-[130px] w-[220px] rounded-md object-cover"
-                          />
-                        </div>
-                      )}
-                    </article>
+                  <li key={t}>
+                    {selected ? (
+                      <span className="text-primary-500 inline-flex rounded-full border border-gray-200 px-3 py-1.5 text-xs font-bold tracking-wide uppercase dark:border-gray-700">
+                        {`${t} (${tagCounts[t]})`}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => filterByTag(t)}
+                        className="hover:text-primary-500 hover:bg-primary-500/10 dark:hover:text-primary-500 cursor-pointer rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium tracking-wide text-gray-500 uppercase transition-colors dark:border-gray-700 dark:text-gray-300"
+                        aria-label={`Filter posts by ${t}`}
+                      >
+                        {`${t} (${tagCounts[t]})`}
+                      </button>
+                    )}
                   </li>
                 )
               })}
             </ul>
-            {pagination && pagination.totalPages > 1 && !filteredPosts && (
-              <Pagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} />
-            )}
           </div>
         </div>
       </div>

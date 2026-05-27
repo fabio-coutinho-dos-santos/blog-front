@@ -33,7 +33,7 @@ const Header = () => {
             <div className="hidden sm:block">
               <div className="h-6 text-2xl font-semibold">{siteMetadata.headerTitle}</div>
               <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                Senior Software Engineer
+                Engenheiro de Software Sênior
               </div>
             </div>
           ) : (
@@ -59,7 +59,7 @@ const Header = () => {
               href="/admin/new-post"
               className="hover:text-primary-500 dark:hover:text-primary-400 m-1 font-medium text-gray-900 dark:text-gray-100"
             >
-              New Post
+              Novo Post
             </Link>
           )}
         </div>

@@ -1,7 +1,8 @@
 export type ApiPost = {
   id: string
   title: string
-  subtitle: string
+  subtitle?: string
+  summary?: string
   content: string
   tags: string[]
   author?: {
@@ -36,7 +37,7 @@ function mapApiPost(post: ApiPost): FrontPost {
   return {
     id: post.id,
     title: post.title,
-    summary: post.subtitle || post.content?.slice(0, 220) || '',
+    summary: post.summary || post.subtitle || post.content?.slice(0, 220) || '',
     content: post.content,
     tags: post.tags || [],
     date: post.created_at,

@@ -17,6 +17,9 @@ export async function POST(request: NextRequest) {
     const data = await response.json()
     return NextResponse.json(data, { status: response.status })
   } catch {
-    return NextResponse.json({ error: 'Could not connect to backend API.' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Não foi possível conectar à API de backend.' },
+      { status: 500 }
+    )
   }
 }

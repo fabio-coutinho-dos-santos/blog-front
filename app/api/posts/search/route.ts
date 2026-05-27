@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const tag = url.searchParams.get('tag') || ''
 
     if (!tag.trim()) {
-      return NextResponse.json({ error: 'Missing tag query param.' }, { status: 400 })
+      return NextResponse.json({ error: 'Parâmetro de tag ausente na consulta.' }, { status: 400 })
     }
 
     const response = await fetch(
@@ -26,6 +26,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(data.map(mapApiPostToFrontPost), { status: 200 })
   } catch {
-    return NextResponse.json({ error: 'Could not connect to backend API.' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Não foi possível conectar à API de backend.' },
+      { status: 500 }
+    )
   }
 }

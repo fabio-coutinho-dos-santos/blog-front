@@ -8,31 +8,31 @@ type Message = {
 }
 
 const suggestedQuestions = [
-  'What are Fabio’s strongest backend skills?',
-  'What kind of architecture work has Fabio led?',
-  'What cloud and platform experience does Fabio have?',
-  'What type of role is Fabio looking for now?',
-  'What are some notable career achievements from Fabio?',
+  'Quais são as habilidades mais fortes de backend do Fabio?',
+  'Que tipo de trabalho de arquitetura o Fabio já liderou?',
+  'Que experiência em cloud e plataforma o Fabio tem?',
+  'Que tipo de posição o Fabio está buscando agora?',
+  'Quais são algumas conquistas de carreira de destaque do Fabio?',
 ]
 
 const fallbackAnswers: Record<string, string> = {
-  'what are fabio’s strongest backend skills?':
-    'Fabio is strongest in Node.js, TypeScript, NestJS, distributed systems design, and backend architecture with strong testing and maintainability practices.',
-  'what kind of architecture work has fabio led?':
-    'He has led monolith-to-microservices transitions, multi-environment staging strategies, compliance-oriented storage architecture, and platform modernization initiatives.',
-  'what cloud and platform experience does fabio have?':
-    'Fabio has hands-on experience with GCP, AWS, Cloudflare R2, CI/CD pipelines, containerized workloads, and cross-team platform enablement.',
-  'what type of role is fabio looking for now?':
-    'He is focused on Senior/Staff-level opportunities in Platform Engineering, Cloud Architecture, and Distributed Systems.',
-  'what are some notable career achievements from fabio?':
-    'Highlights include impactful onboarding and engagement backend work, infrastructure modernization, and scalable platform improvements across multiple domains.',
+  'quais são as habilidades mais fortes de backend do fabio?':
+    'Fabio é mais forte em Node.js, TypeScript, NestJS, design de sistemas distribuídos e arquitetura backend, com boas práticas de testes e manutenibilidade.',
+  'que tipo de trabalho de arquitetura o fabio já liderou?':
+    'Ele liderou transições de monólito para microservices, estratégias de staging multiambiente, arquitetura de storage orientada a compliance e iniciativas de modernização de plataforma.',
+  'que experiência em cloud e plataforma o fabio tem?':
+    'Fabio tem experiência prática com GCP, AWS, Cloudflare R2, pipelines de CI/CD, workloads containerizados e habilitação de plataforma entre times.',
+  'que tipo de posição o fabio está buscando agora?':
+    'Ele está focado em oportunidades de nível Senior/Staff em Engenharia de Plataforma, Arquitetura em Nuvem e Sistemas Distribuídos.',
+  'quais são algumas conquistas de carreira de destaque do fabio?':
+    'Entre os destaques estão trabalhos de backend com impacto em onboarding e engajamento, modernização de infraestrutura e melhorias escaláveis de plataforma em múltiplos domínios.',
 }
 
 function getLocalAnswer(question: string) {
   const normalized = question.trim().toLowerCase()
   return (
     fallbackAnswers[normalized] ||
-    'Great question. This chat is ready for your AI endpoint. For now, I can answer general career-focused questions about Fabio’s backend, cloud, platform, and architecture experience.'
+    'Ótima pergunta. Este chat está pronto para seu endpoint de AI. Por enquanto, consigo responder perguntas gerais sobre carreira, backend, cloud, plataforma e arquitetura do Fabio.'
   )
 }
 
@@ -44,7 +44,7 @@ export default function CareerChatWidget() {
     {
       role: 'assistant',
       content:
-        "Hi, I'm Fabio's career assistant. Ask me professional questions about his background, architecture work, cloud experience, and career focus.",
+        'Olá, sou o assistente de carreira do Fabio. Faça perguntas profissionais sobre trajetória, arquitetura, experiência em cloud e foco de carreira.',
     },
   ])
 
@@ -93,15 +93,17 @@ export default function CareerChatWidget() {
         className="bg-primary-700 hover:bg-primary-600 border-primary-400/40 fixed right-6 bottom-6 z-[120] inline-flex items-center gap-2 rounded-full border px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-black/30"
       >
         <span aria-hidden>⚡</span>
-        {isOpen ? 'Close Chat' : 'Ask Fabio AI'}
+        {isOpen ? 'Fechar Chat' : 'Perguntar ao Fabio AI'}
       </button>
 
       {isOpen && (
         <div className="fixed right-6 bottom-24 z-[120] flex h-[32rem] w-[22rem] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-900">
           <div className="from-primary-100 to-primary-50 dark:from-primary-500/20 dark:to-primary-600/5 border-b border-gray-200 bg-gradient-to-br px-4 py-3 dark:border-gray-700">
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Career Chat</p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              Chat de Carreira
+            </p>
             <p className="text-xs text-gray-600 dark:text-gray-400">
-              Professional and personal career curiosity
+              Curiosidades profissionais e pessoais sobre carreira
             </p>
           </div>
 
@@ -125,14 +127,14 @@ export default function CareerChatWidget() {
                   <span className="bg-primary-500 h-1.5 w-1.5 animate-pulse rounded-full" />
                   <span className="bg-primary-500 h-1.5 w-1.5 animate-pulse rounded-full [animation-delay:120ms]" />
                   <span className="bg-primary-500 h-1.5 w-1.5 animate-pulse rounded-full [animation-delay:240ms]" />
-                  Thinking...
+                  Pensando...
                 </span>
               </div>
             )}
 
             <div className="border-primary-200/70 bg-primary-50/40 dark:border-primary-700/40 dark:bg-primary-900/10 rounded-xl border p-3 pt-2">
               <p className="mb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
-                Suggested questions
+                Perguntas sugeridas
               </p>
               <div className="flex flex-wrap gap-2">
                 {suggestedQuestions.map((question) => (
@@ -157,7 +159,7 @@ export default function CareerChatWidget() {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about Fabio..."
+                placeholder="Pergunte sobre o Fabio..."
                 className="focus:ring-primary-500 border-primary-300 dark:border-primary-700/60 flex-1 rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 focus:border-transparent focus:ring-2 focus:outline-none dark:bg-gray-950 dark:text-gray-100"
               />
               <button
@@ -165,7 +167,7 @@ export default function CareerChatWidget() {
                 disabled={isLoading}
                 className="bg-primary-700 hover:bg-primary-600 rounded-lg px-3 py-2 text-sm font-semibold text-white disabled:opacity-60"
               >
-                {isLoading ? '...' : 'Send'}
+                {isLoading ? '...' : 'Enviar'}
               </button>
             </div>
           </form>
