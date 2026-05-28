@@ -151,8 +151,11 @@ export default function ListLayoutWithTags({
           )}
           <ul className="divide-y divide-gray-200 dark:divide-gray-800">
             {displayPosts.map((post) => {
-              const { id, path, date, title, summary, imagePath } = post
+              const { id, path, date, title, summary, imagePath, status } = post
               const imageUrl = buildR2ImageUrl(imagePath)
+              const isPending = status === 'pending'
+              const isFailed = status === 'fail'
+              const isCompleted = status === 'completed'
               return (
                 <li key={id} className="py-8">
                   <article className="grid grid-cols-1 gap-6 sm:grid-cols-[minmax(0,1fr)_400px] sm:items-center">
@@ -167,7 +170,7 @@ export default function ListLayoutWithTags({
                       </dl>
                       <div>
                         <h2 className="text-2xl leading-8 font-bold tracking-tight">
-                          {path ? (
+                          {path && isCompleted ? (
                             <Link href={`/${path}`} className="text-gray-900 dark:text-gray-100">
                               {title}
                             </Link>
@@ -186,10 +189,53 @@ export default function ListLayoutWithTags({
                           </div>
                         )}
                       </div>
-                      <div className="prose max-w-none text-lg leading-8 text-gray-500 dark:text-gray-400">
-                        {summary}
-                      </div>
-                      {!!post.tags?.length && (
+                      {!isCompleted && (
+                        <div className="pt-1">
+                          <span
+                            className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold uppercase ${
+                              isPending
+                                ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'
+                            }`}
+                          ></span>
+                        </div>
+                      )}
+                      {isCompleted && (
+                        <div className="prose max-w-none text-lg leading-8 text-gray-500 dark:text-gray-400">
+                          {summary}
+                        </div>
+                      )}
+                      {!isCompleted && (
+                        <div className="space-y-3">
+                          <div
+                            className={`relative overflow-hidden rounded-xl border p-4 ${
+                              isPending
+                                ? 'border-amber-200/70 bg-amber-50/70 dark:border-amber-800/50 dark:bg-amber-900/10'
+                                : 'border-red-200/70 bg-red-50/70 dark:border-red-800/50 dark:bg-red-900/10'
+                            }`}
+                          >
+                            <div className="pointer-events-none absolute inset-0 backdrop-blur-sm" />
+                            {isPending && (
+                              <div className="relative space-y-2">
+                                <div className="h-4 w-5/6 animate-pulse rounded bg-gray-300/70 dark:bg-gray-600/70" />
+                                <div className="h-4 w-full animate-pulse rounded bg-gray-300/70 dark:bg-gray-600/70" />
+                                <div className="h-4 w-4/6 animate-pulse rounded bg-gray-300/70 dark:bg-gray-600/70" />
+                              </div>
+                            )}
+                            {isFailed && (
+                              <p className="relative text-sm font-medium text-red-700 dark:text-red-300">
+                                Resumo indisponível no momento.
+                              </p>
+                            )}
+                          </div>
+                          {isPending && (
+                            <p className="text-xs font-medium tracking-wide text-amber-700 uppercase dark:text-amber-300">
+                              Processando...
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      {isCompleted && !!post.tags?.length && (
                         <footer className="flex flex-wrap items-center gap-2 pt-2">
                           {post.tags.map((tag) => (
                             <button

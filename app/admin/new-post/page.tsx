@@ -161,7 +161,7 @@ export default function NewPostPage() {
             htmlFor="image"
             className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
           >
-            Imagem (png, jpg, jpeg - máx. 1MB)
+            Imagem (png, jpg, jpeg - máx. 5MB)
           </label>
           <input
             id="image"

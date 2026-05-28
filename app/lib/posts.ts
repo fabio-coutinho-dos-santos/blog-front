@@ -1,6 +1,7 @@
 export type ApiPost = {
   id: string
   title: string
+  status?: string
   subtitle?: string
   summary?: string
   content: string
@@ -18,6 +19,7 @@ export type ApiPost = {
 export type FrontPost = {
   id: string
   title: string
+  status: 'pending' | 'fail' | 'completed'
   summary: string
   content?: string
   tags: string[]
@@ -34,9 +36,18 @@ export type FrontPost = {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000'
 
 function mapApiPost(post: ApiPost): FrontPost {
+  const normalizedStatus = (post.status || 'completed').toLowerCase()
+  const status: FrontPost['status'] =
+    normalizedStatus === 'pending'
+      ? 'pending'
+      : normalizedStatus === 'fail' || normalizedStatus === 'failed'
+        ? 'fail'
+        : 'completed'
+
   return {
     id: post.id,
     title: post.title,
+    status,
     summary: post.summary || post.subtitle || post.content?.slice(0, 220) || '',
     content: post.content,
     tags: post.tags || [],
