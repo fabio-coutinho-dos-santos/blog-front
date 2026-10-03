@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from 'app/context/auth-context'
 import { buildR2ImageUrl } from 'app/lib/posts'
+import { addVideoToPlaylist, createPlaylist, listPlaylists } from 'app/lib/playlists-client'
+import type { ApiPlaylist } from 'app/lib/videos'
 import {
   UploadCancelledError,
   UploadProgress,
@@ -24,6 +26,9 @@ type Status = 'idle' | 'uploading' | 'done' | 'error' | 'cancelled'
 
 type PostOption = { id: string; title: string; imagePath?: string }
 
+// Value of the playlist select that reveals the "new playlist" fields
+const NEW_PLAYLIST = '__new__'
+
 export default function UploadVideoPage() {
   const router = useRouter()
   const { accessToken, isAuthenticated } = useAuth()
@@ -36,6 +41,13 @@ export default function UploadVideoPage() {
   const [cover, setCover] = useState<File | null>(null)
   const [coverPreview, setCoverPreview] = useState('')
   const [posts, setPosts] = useState<PostOption[]>([])
+  const [playlists, setPlaylists] = useState<ApiPlaylist[]>([])
+  const [playlistChoice, setPlaylistChoice] = useState('')
+  const [newPlaylistTitle, setNewPlaylistTitle] = useState('')
+  const [newPlaylistDescription, setNewPlaylistDescription] = useState('')
+  const [playlistResult, setPlaylistResult] = useState<{ ok: boolean; message: string } | null>(
+    null
+  )
   const [status, setStatus] = useState<Status>('idle')
   const [progress, setProgress] = useState<UploadProgress | null>(null)
   const [partSize, setPartSize] = useState(0)
@@ -65,6 +77,43 @@ export default function UploadVideoPage() {
       )
       .catch(() => setPosts([]))
   }, [])
+
+  useEffect(() => {
+    listPlaylists()
+      .then(setPlaylists)
+      .catch(() => setPlaylists([]))
+  }, [])
+
+  // Runs after the upload completed, so a failed/cancelled upload never leaves an
+  // empty playlist or a reference to a video that doesn't exist
+  const attachToPlaylist = async (token: string, uploadedVideoId: string) => {
+    if (!playlistChoice) return
+    try {
+      let playlistId = playlistChoice
+      let playlistTitle = playlists.find((p) => p.id === playlistChoice)?.title || ''
+      if (playlistChoice === NEW_PLAYLIST) {
+        const created = await createPlaylist(token, {
+          title: newPlaylistTitle,
+          description: newPlaylistDescription,
+        })
+        playlistId = created.id
+        playlistTitle = created.title
+        setPlaylists((current) => [created, ...current])
+        setPlaylistChoice(created.id)
+        setNewPlaylistTitle('')
+        setNewPlaylistDescription('')
+      }
+      await addVideoToPlaylist(token, playlistId, uploadedVideoId)
+      setPlaylistResult({ ok: true, message: `Adicionado à playlist "${playlistTitle}".` })
+    } catch (err) {
+      setPlaylistResult({
+        ok: false,
+        message: `O vídeo foi enviado, mas não entrou na playlist: ${
+          err instanceof Error ? err.message : 'erro desconhecido'
+        }. Use "Adicionar à playlist" na página do vídeo.`,
+      })
+    }
+  }
 
   // Local preview of the chosen cover; the object URL is released when it changes
   useEffect(() => {
@@ -111,6 +160,10 @@ export default function UploadVideoPage() {
       setError('Título obrigatório.')
       return
     }
+    if (playlistChoice === NEW_PLAYLIST && !newPlaylistTitle.trim()) {
+      setError('Dê um título para a nova playlist.')
+      return
+    }
     if (!postId && !cover) {
       setError('Envie uma imagem de capa (ou escolha um post para usar a imagem dele).')
       return
@@ -130,6 +183,7 @@ export default function UploadVideoPage() {
 
     setStatus('uploading')
     setError('')
+    setPlaylistResult(null)
     setVideoId('')
     setSpeed(0)
     setProgress({ uploadedBytes: 0, totalBytes: file.size, completedParts: 0, totalParts: 0 })
@@ -151,6 +205,7 @@ export default function UploadVideoPage() {
         onProgress: handleProgress,
       })
       setVideoId(result.videoId)
+      await attachToPlaylist(accessToken, result.videoId)
       setStatus('done')
       // Clear the file so the same video isn't uploaded (and encoded) twice by accident
       setFile(null)
@@ -248,6 +303,55 @@ export default function UploadVideoPage() {
               </option>
             ))}
           </select>
+        </div>
+        <div>
+          <label
+            htmlFor="playlist"
+            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
+          >
+            Playlist (opcional)
+          </label>
+          <select
+            id="playlist"
+            value={playlistChoice}
+            onChange={(e) => setPlaylistChoice(e.target.value)}
+            disabled={uploading}
+            className="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring-2 focus:outline-none disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-500"
+          >
+            <option value="">Nenhuma</option>
+            {playlists.map((playlist) => (
+              <option key={playlist.id} value={playlist.id}>
+                {playlist.title} ({playlist.items.length})
+              </option>
+            ))}
+            <option value={NEW_PLAYLIST}>+ Nova playlist…</option>
+          </select>
+          {playlistChoice === NEW_PLAYLIST && (
+            <div className="mt-3 space-y-2 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+              <input
+                type="text"
+                value={newPlaylistTitle}
+                onChange={(e) => setNewPlaylistTitle(e.target.value)}
+                placeholder="Título da playlist"
+                aria-label="Título da nova playlist"
+                required
+                disabled={uploading}
+                className="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring-2 focus:outline-none disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-500"
+              />
+              <input
+                type="text"
+                value={newPlaylistDescription}
+                onChange={(e) => setNewPlaylistDescription(e.target.value)}
+                placeholder="Descrição (opcional)"
+                aria-label="Descrição da nova playlist"
+                disabled={uploading}
+                className="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring-2 focus:outline-none disabled:opacity-60 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-500"
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                A playlist é criada quando o upload terminar.
+              </p>
+            </div>
+          )}
         </div>
         <div>
           <label
@@ -364,6 +468,13 @@ export default function UploadVideoPage() {
         {status === 'done' && (
           <div className="rounded-md bg-green-500/10 p-3 text-sm text-green-700 dark:text-green-300">
             <p>Vídeo enviado. A conversão para HLS começou e pode levar alguns minutos.</p>
+            {playlistResult && (
+              <p
+                className={`mt-1 ${playlistResult.ok ? '' : 'text-amber-700 dark:text-amber-300'}`}
+              >
+                {playlistResult.message}
+              </p>
+            )}
             <p className="mt-1">
               ID: <code className="text-xs">{videoId}</code> ·{' '}
               <Link href={`/video?id=${videoId}`} className="font-semibold underline">

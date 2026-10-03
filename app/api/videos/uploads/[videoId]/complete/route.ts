@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { forwardToApi } from '../../proxy'
+import { forwardToApi } from 'app/lib/api-proxy'
 
 // Joins the parts in R2 and publishes video.uploaded for the encoder
 export async function POST(

@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000'
 
-// Only small JSON goes through here (init/complete/abort). The video parts go
-// from the browser straight to R2 with the presigned URLs.
+// Forwards small JSON requests (and the Authorization header) to the Go API.
+// Video bytes never go through here: the browser PUTs them straight to R2.
 export async function forwardToApi(
   request: NextRequest,
   path: string,

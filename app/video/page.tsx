@@ -1,3 +1,4 @@
+import AddToPlaylistButton from '@/components/AddToPlaylistButton'
 import HlsVideoPlayer from '@/components/HlsVideoPlayer'
 import Link from '@/components/Link'
 import UploadVideoCta from '@/components/UploadVideoCta'
@@ -96,9 +97,15 @@ export default async function VideoPage({ searchParams }: { searchParams: Search
                 </p>
               )}
 
-              <h2 className="mt-4 text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {current.title}
-              </h2>
+              <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  {current.title}
+                </h2>
+                {/* Only videos with a database record (not the pre-database fallback) */}
+                {current.createdAt && (
+                  <AddToPlaylistButton videoId={current.id} videoTitle={current.title} />
+                )}
+              </div>
               <div className="mt-1 flex flex-wrap gap-x-3 text-sm text-gray-500 dark:text-gray-400">
                 {formatDuration(current.durationSec) && (
                   <span>{formatDuration(current.durationSec)}</span>
