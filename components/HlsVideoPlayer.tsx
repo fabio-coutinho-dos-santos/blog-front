@@ -7,9 +7,11 @@ import 'plyr/dist/plyr.css'
 
 type HlsVideoPlayerProps = {
   src: string
+  // Image shown before playback starts (the video cover)
+  poster?: string
 }
 
-export default function HlsVideoPlayer({ src }: HlsVideoPlayerProps) {
+export default function HlsVideoPlayer({ src, poster }: HlsVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const hlsRef = useRef<Hls | null>(null)
   const plyrRef = useRef<Plyr | null>(null)
@@ -24,13 +26,15 @@ export default function HlsVideoPlayer({ src }: HlsVideoPlayerProps) {
     let plyr: Plyr | null = null
 
     if (Hls.isSupported()) {
-      hls = new Hls()
-      hlsRef.current = hls
-      hls.loadSource(src)
-      hls.attachMedia(video)
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      // Non-null local for the callbacks below (hls itself is nullable for the cleanup)
+      const instance = new Hls()
+      hls = instance
+      hlsRef.current = instance
+      instance.loadSource(src)
+      instance.attachMedia(video)
+      instance.on(Hls.Events.MANIFEST_PARSED, () => {
         const heights = [
-          ...new Set(hls.levels.map((level) => level.height).filter((h) => h > 0)),
+          ...new Set(instance.levels.map((level) => level.height).filter((h) => h > 0)),
         ].sort((a, b) => b - a)
 
         const defaultQuality = heights[0] || 0
@@ -41,9 +45,9 @@ export default function HlsVideoPlayer({ src }: HlsVideoPlayerProps) {
             options: heights,
             forced: true,
             onChange: (newQuality: number) => {
-              hls!.levels.forEach((level, levelIndex) => {
+              instance.levels.forEach((level, levelIndex) => {
                 if (level.height === newQuality) {
-                  hls!.currentLevel = levelIndex
+                  instance.currentLevel = levelIndex
                 }
               })
             },
@@ -51,7 +55,7 @@ export default function HlsVideoPlayer({ src }: HlsVideoPlayerProps) {
         })
         plyrRef.current = plyr
       })
-      hls.on(Hls.Events.ERROR, (_, data) => {
+      instance.on(Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
           setError('Could not load this video stream.')
         }
@@ -87,6 +91,7 @@ export default function HlsVideoPlayer({ src }: HlsVideoPlayerProps) {
         controls
         playsInline
         preload="metadata"
+        poster={poster}
       />
       {error ? <p className="text-sm text-red-600 dark:text-red-400">{error}</p> : null}
     </div>

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { forwardToApi } from '../proxy'
+import { forwardToApi } from 'app/lib/api-proxy'
 
 // Cancels the upload and discards the parts already sent to R2
 export async function DELETE(
