@@ -26,6 +26,19 @@ async function toNextResponse(response: Response) {
   return NextResponse.json(data, { status })
 }
 
+// Used by the admin video upload form to list the posts a video can belong to
+export async function GET() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/posts`, { cache: 'no-store' })
+    return await toNextResponse(response)
+  } catch {
+    return NextResponse.json(
+      { error: 'Não foi possível conectar à API de backend.' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()

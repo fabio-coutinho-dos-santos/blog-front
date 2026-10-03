@@ -24,8 +24,17 @@ export type UploadProgress = {
   totalParts: number
 }
 
+export type VideoMetadata = {
+  title: string
+  description?: string
+  // The uploaded cover wins; the post image is the fallback. Without a post, cover is required
+  postId?: string
+  cover?: File
+}
+
 type UploadOptions = {
   accessToken: string
+  metadata: VideoMetadata
   onProgress?: (progress: UploadProgress) => void
   onStarted?: (info: { videoId: string; totalParts: number; partSize: number }) => void
   signal?: AbortSignal
@@ -97,14 +106,27 @@ export async function uploadVideoMultipart(file: File, options: UploadOptions) {
   options.signal?.addEventListener('abort', () => controller.abort(), { once: true })
   const signal = controller.signal
 
-  const init = await api<InitResponse>('/api/videos/uploads', accessToken, {
+  // multipart/form-data so the cover image goes in the same request as the metadata
+  const { title, description, postId, cover } = options.metadata
+  const form = new FormData()
+  form.append('fileName', file.name)
+  form.append('contentType', file.type || 'video/mp4')
+  form.append('size', String(file.size))
+  form.append('title', title)
+  if (description) form.append('description', description)
+  if (postId) form.append('postId', postId)
+  if (cover) form.append('cover', cover)
+
+  const initResponse = await fetch('/api/videos/uploads', {
     method: 'POST',
-    body: JSON.stringify({
-      fileName: file.name,
-      contentType: file.type || 'video/mp4',
-      size: file.size,
-    }),
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: form,
   })
+  const initData = await initResponse.json().catch(() => null)
+  if (!initResponse.ok) {
+    throw new Error(initData?.error || `Erro ${initResponse.status} na API.`)
+  }
+  const init = initData as InitResponse
 
   const { videoId, uploadId, partSize, parts } = init
   onStarted?.({ videoId, totalParts: parts.length, partSize })
