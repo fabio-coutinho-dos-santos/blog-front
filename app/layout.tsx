@@ -10,6 +10,8 @@ import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
 import SectionContainer from '@/components/SectionContainer'
 import { getHeaderNavLinks } from '@/data/headerNavLinks'
+import { EnvironmentProvider } from 'app/context/environment-context'
+import { isProductionEnvironment } from 'app/lib/environment'
 import Footer from '@/components/Footer'
 // import CareerChatWidget from '@/components/CareerChatWidget'
 import siteMetadata from '@/data/siteMetadata'
@@ -99,17 +101,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
       <body className="bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
-        <ThemeProviders>
-          <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
-          <SectionContainer>
-            <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
-              <Header links={getHeaderNavLinks()} />
-              <main className="mb-auto">{children}</main>
-              {/* <CareerChatWidget /> */}
-            </SearchProvider>
-            <Footer />
-          </SectionContainer>
-        </ThemeProviders>
+        <EnvironmentProvider isProduction={isProductionEnvironment()}>
+          <ThemeProviders>
+            <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
+            <SectionContainer>
+              <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
+                <Header links={getHeaderNavLinks()} />
+                <main className="mb-auto">{children}</main>
+                {/* <CareerChatWidget /> */}
+              </SearchProvider>
+              <Footer />
+            </SectionContainer>
+          </ThemeProviders>
+        </EnvironmentProvider>
       </body>
     </html>
   )

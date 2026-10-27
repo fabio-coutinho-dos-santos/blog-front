@@ -8,6 +8,7 @@ import Link from '@/components/Link'
 import siteMetadata from '@/data/siteMetadata'
 import { buildR2ImageUrl, mapApiPostToFrontPost, type FrontPost } from 'app/lib/posts'
 import { useAuth } from 'app/context/auth-context'
+import { useEnvironment } from 'app/context/environment-context'
 import Image from '@/components/Image'
 
 interface PaginationProps {
@@ -72,6 +73,7 @@ export default function ListLayoutWithTags({
 }: ListLayoutProps) {
   const pathname = usePathname()
   const { isAuthenticated } = useAuth()
+  const { isProduction } = useEnvironment()
   const [activeTag, setActiveTag] = useState<string | null>(null)
   const [filteredPosts, setFilteredPosts] = useState<FrontPost[] | null>(null)
   const [isFiltering, setIsFiltering] = useState(false)
@@ -178,7 +180,7 @@ export default function ListLayoutWithTags({
                             <span className="text-gray-900 dark:text-gray-100">{title}</span>
                           )}
                         </h2>
-                        {isAuthenticated && pathname.startsWith('/blog') && (
+                        {isAuthenticated && !isProduction && pathname.startsWith('/blog') && (
                           <div className="mt-3">
                             <Link
                               href={`/admin/manage-posts?postId=${id}`}
