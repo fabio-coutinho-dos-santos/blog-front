@@ -20,6 +20,7 @@ export type FrontPost = {
   id: string
   title: string
   status: 'pending' | 'fail' | 'completed'
+  subtitle?: string
   summary: string
   content?: string
   tags: string[]
@@ -48,6 +49,7 @@ function mapApiPost(post: ApiPost): FrontPost {
     id: post.id,
     title: post.title,
     status,
+    subtitle: post.subtitle,
     summary: post.summary || post.subtitle || post.content?.slice(0, 220) || '',
     content: post.content,
     tags: post.tags || [],

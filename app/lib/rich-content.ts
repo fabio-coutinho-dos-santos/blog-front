@@ -1,110 +1,71 @@
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
+import { unified } from 'unified'
+import remarkParse from 'remark-parse'
+import remarkGfm from 'remark-gfm'
+import remarkRehype from 'remark-rehype'
+import rehypePrismPlus from 'rehype-prism-plus'
+import rehypeStringify from 'rehype-stringify'
+import { viewerHref } from './viewer'
+
+// Minimal hast types for the plugin below (avoids pulling @types/hast)
+type HastNode = {
+  type: string
+  tagName?: string
+  value?: string
+  properties?: Record<string, unknown>
+  children?: HastNode[]
 }
 
-function applyInlineMarkdown(text: string): string {
-  return text
-    .replace(
-      /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-      '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
-    )
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/__([^_]+)__/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/_([^_]+)_/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
+const ZOOM_PREFIX = /^zoom:\s*/i
+
+// `![zoom: Caption](url)` alone in a paragraph becomes a link to the public full-page
+// viewer (app/viewer), instead of an <img>: a big map would cost hundreds of MB inline.
+function rehypeZoomImages() {
+  return (tree: HastNode) => {
+    const walk = (node: HastNode) => {
+      node.children = node.children?.map((child) => {
+        const meaningful = child.children?.filter((c) => !(c.type === 'text' && !c.value?.trim()))
+        const img = meaningful?.length === 1 ? meaningful[0] : undefined
+        const alt = String(img?.properties?.alt ?? '')
+        if (child.tagName === 'p' && img?.tagName === 'img' && ZOOM_PREFIX.test(alt)) {
+          const title = alt.replace(ZOOM_PREFIX, '')
+          return {
+            type: 'element',
+            tagName: 'p',
+            children: [
+              {
+                type: 'element',
+                tagName: 'a',
+                properties: {
+                  href: viewerHref(String(img.properties?.src ?? ''), title),
+                  target: '_blank',
+                  rel: 'noopener noreferrer',
+                  className: ['viewer-link'],
+                },
+                children: [{ type: 'text', value: `${title}: abrir o visualizador interativo ↗` }],
+              },
+            ],
+          }
+        }
+        walk(child)
+        return child
+      })
+    }
+    walk(tree)
+  }
 }
 
-function autoLinkUrls(text: string): string {
-  return text.replace(
-    /(^|[\s(])(https?:\/\/[^\s<]+)/g,
-    '$1<a href="$2" target="_blank" rel="noopener noreferrer">$2</a>'
-  )
-}
+// Markdown → HTML for posts: GFM (tables, task lists, autolinks, strikethrough) and
+// code blocks highlighted by Prism (colors in css/prism.css). Raw HTML inside the
+// content is dropped (remark-rehype default), so the output is safe to inject.
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkGfm)
+  .use(remarkRehype)
+  .use(rehypeZoomImages)
+  .use(rehypePrismPlus, { ignoreMissing: true })
+  .use(rehypeStringify)
 
 export function formatRichContent(content?: string): string {
   if (!content) return ''
-
-  let formatted = content.replace(/\r\n|\r/g, '\n')
-
-  const codeBlocks: string[] = []
-  formatted = formatted.replace(
-    /```([a-zA-Z0-9_-]+)?\n?([\s\S]*?)```/g,
-    (_, lang: string, code: string) => {
-      const languageLabel = lang ? `<span class="code-lang">${escapeHtml(lang)}</span>` : ''
-      const html = `<div class="code-block">${languageLabel}<pre><code>${escapeHtml(code.trim())}</code></pre></div>`
-      codeBlocks.push(html)
-      return `@@CODEBLOCK${codeBlocks.length - 1}@@`
-    }
-  )
-
-  formatted = formatted.replace(/^######\s+(.+)$/gm, '<h6>$1</h6>')
-  formatted = formatted.replace(/^#####\s+(.+)$/gm, '<h5>$1</h5>')
-  formatted = formatted.replace(/^####\s+(.+)$/gm, '<h4>$1</h4>')
-  formatted = formatted.replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
-  formatted = formatted.replace(/^##\s+(.+)$/gm, '<h2>$1</h2>')
-  formatted = formatted.replace(/^#\s+(.+)$/gm, '<h1>$1</h1>')
-  formatted = formatted.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>')
-
-  formatted = formatted.replace(
-    /(^|\n)((?:[-*]\s+.+(?:\n|$))+)/g,
-    (_, prefix: string, listBlock: string) => {
-      const items = listBlock
-        .trim()
-        .split('\n')
-        .map((line: string) => line.replace(/^[-*]\s+/, '').trim())
-        .map((item: string) => `<li>${item}</li>`)
-        .join('')
-      return `${prefix}<ul>${items}</ul>\n`
-    }
-  )
-
-  formatted = formatted.replace(
-    /(^|\n)((?:\d+\.\s+.+(?:\n|$))+)/g,
-    (_, prefix: string, listBlock: string) => {
-      const items = listBlock
-        .trim()
-        .split('\n')
-        .map((line: string) => line.replace(/^\d+\.\s+/, '').trim())
-        .map((item: string) => `<li>${item}</li>`)
-        .join('')
-      return `${prefix}<ol>${items}</ol>\n`
-    }
-  )
-
-  formatted = formatted
-    .split('\n\n')
-    .map((block) => {
-      const trimmed = block.trim()
-      if (!trimmed) return ''
-      if (
-        trimmed.startsWith('<h') ||
-        trimmed.startsWith('<ul>') ||
-        trimmed.startsWith('<ol>') ||
-        trimmed.startsWith('<pre>') ||
-        trimmed.startsWith('<blockquote>') ||
-        trimmed.startsWith('<div') ||
-        trimmed.startsWith('<p') ||
-        trimmed.startsWith('<img') ||
-        trimmed.startsWith('<table')
-      ) {
-        return trimmed
-      }
-      return `<p>${trimmed.replace(/\n/g, '<br />')}</p>`
-    })
-    .join('\n')
-
-  formatted = applyInlineMarkdown(formatted)
-  formatted = autoLinkUrls(formatted)
-
-  formatted = formatted.replace(/@@CODEBLOCK(\d+)@@/g, (_, index: string) => {
-    return codeBlocks[Number(index)] || ''
-  })
-
-  return formatted
+  return String(processor.processSync(content))
 }

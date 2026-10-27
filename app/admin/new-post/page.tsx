@@ -3,7 +3,19 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from 'app/context/auth-context'
-import { formatRichContent } from 'app/lib/rich-content'
+import PostContent from '@/components/PostContent'
+
+// Same normalization the API applies, so the preview shows the tags as they will be saved
+function parseTags(raw: string) {
+  return [
+    ...new Set(
+      raw
+        .split(',')
+        .map((tag) => tag.trim().toLowerCase())
+        .filter(Boolean)
+    ),
+  ]
+}
 
 export default function NewPostPage() {
   const router = useRouter()
@@ -12,6 +24,8 @@ export default function NewPostPage() {
   const [title, setTitle] = useState('')
   const [subtitle, setSubtitle] = useState('')
   const [content, setContent] = useState('')
+  const [summary, setSummary] = useState('')
+  const [tags, setTags] = useState('')
   const [image, setImage] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -44,6 +58,8 @@ export default function NewPostPage() {
       formData.append('title', title)
       formData.append('subtitle', subtitle)
       formData.append('content', content)
+      formData.append('summary', summary)
+      formData.append('tags', tags)
       formData.append('image', image)
 
       const response = await fetch('/api/posts', {
@@ -123,6 +139,58 @@ export default function NewPostPage() {
         </div>
         <div>
           <label
+            htmlFor="summary"
+            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
+          >
+            Resumo
+          </label>
+          <textarea
+            id="summary"
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="Uma ou duas frases que aparecem na listagem de posts"
+            className="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-500"
+          />
+          <p className="mt-1 text-right text-xs text-gray-500 tabular-nums dark:text-gray-400">
+            {summary.length}/500
+          </p>
+        </div>
+        <div>
+          <label
+            htmlFor="tags"
+            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
+          >
+            Tags
+          </label>
+          <input
+            id="tags"
+            type="text"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            placeholder="aws, cloud, certificação"
+            aria-describedby="tags-hint"
+            className="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-500"
+          />
+          <p id="tags-hint" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Separadas por vírgula. Viram minúsculas e as repetidas são ignoradas.
+          </p>
+          {parseTags(tags).length > 0 && (
+            <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Tags que serão salvas">
+              {parseTags(tags).map((tag) => (
+                <li
+                  key={tag}
+                  className="bg-primary-500/10 text-primary-600 dark:text-primary-300 rounded-full px-2.5 py-0.5 text-xs font-medium"
+                >
+                  {tag}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div>
+          <label
             htmlFor="content"
             className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
           >
@@ -152,7 +220,7 @@ export default function NewPostPage() {
               Prévia
             </p>
             <article className="prose dark:prose-invert max-w-none">
-              <div dangerouslySetInnerHTML={{ __html: formatRichContent(content) }} />
+              <PostContent content={content} />
             </article>
           </div>
         )}

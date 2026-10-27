@@ -100,35 +100,37 @@
     & :where(code):not(pre code) {
       color: var(--color-indigo-500);
     }
-    & .code-block {
+    /* Link to the full-page image viewer (`![zoom: ...](url)` in a post) */
+    & a.viewer-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--color-primary-500);
+      border-radius: var(--radius-lg);
+      font-weight: 600;
+      text-decoration: none;
+      &:hover {
+        background-color: color-mix(in oklab, var(--color-primary-500) 10%, transparent);
+      }
+    }
+    /* Code blocks: the token colors in css/prism.css (Night Owl) are made for this dark
+       background, so it is the same in light and dark mode — on a light or transparent
+       background several tokens become unreadable */
+    & pre {
       margin-top: 1.25rem;
       margin-bottom: 1.25rem;
-      border: 1px solid var(--color-gray-300);
+      background: #011627;
+      color: #d6deeb;
+      border: 1px solid var(--color-gray-800);
       border-radius: var(--radius-lg);
-      background: linear-gradient(180deg, var(--color-gray-100), var(--color-gray-50));
-      overflow: hidden;
-    }
-    & .code-lang {
-      display: inline-block;
-      font-size: 0.7rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0.35rem 0.65rem;
-      color: var(--color-gray-700);
-      background-color: var(--color-gray-200);
-      border-bottom: 1px solid var(--color-gray-300);
-    }
-    & pre {
-      margin: 0;
-      background: transparent;
-      border-radius: 0;
-      padding: 1rem 1rem 1.1rem;
+      padding: 1rem;
       overflow-x: auto;
       font-size: 0.9rem;
-      line-height: 1.55;
+      line-height: 1.6;
     }
     & pre code {
-      color: var(--color-gray-900);
+      color: inherit;
       background: transparent;
       padding: 0;
       font-size: inherit;
@@ -151,17 +153,8 @@
     & :where(h1, h2, h3, h4, h5, h6) {
       color: var(--color-gray-100);
     }
-    & .code-block {
-      border: 1px solid var(--color-gray-700);
-      background: linear-gradient(180deg, #0f172a, #020617);
-    }
-    & .code-lang {
-      color: var(--color-gray-300);
-      background-color: #111827;
-      border-bottom: 1px solid var(--color-gray-700);
-    }
-    & pre code {
-      color: var(--color-gray-100);
+    & pre {
+      border-color: var(--color-gray-700);
     }
   }
 }

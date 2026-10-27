@@ -1,4 +1,6 @@
 import 'css/tailwind.css'
+// Syntax highlighting colors for code blocks in posts (rehype-prism-plus)
+import 'css/prism.css'
 import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 

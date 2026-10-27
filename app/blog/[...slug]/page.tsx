@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getPosts, buildR2ImageUrl } from 'app/lib/posts'
-import { formatRichContent } from 'app/lib/rich-content'
+import PostContent from '@/components/PostContent'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
 import { formatDate } from 'pliny/utils/formatDate'
@@ -84,7 +84,7 @@ export default async function PostDetailsPage({ params }: PageProps) {
       )}
 
       <section className="prose dark:prose-invert max-w-none">
-        <div dangerouslySetInnerHTML={{ __html: formatRichContent(post.content) }} />
+        <PostContent content={post.content} />
       </section>
     </article>
   )

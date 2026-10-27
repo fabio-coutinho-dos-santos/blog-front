@@ -77,7 +77,7 @@ export default function ManagePostsPage() {
       const formData = new FormData()
       formData.append('title', post.title)
       formData.append('summary', post.summary || '')
-      formData.append('subtitle', post.summary || '')
+      formData.append('subtitle', post.subtitle || '')
       formData.append('content', post.content || '')
       formData.append('tags', post.tagsInput || '')
       if (post.imageFile) {
@@ -193,6 +193,20 @@ export default function ManagePostsPage() {
             />
 
             <label
+              htmlFor={`subtitle-${post.id}`}
+              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
+              Subtítulo
+            </label>
+            <input
+              id={`subtitle-${post.id}`}
+              type="text"
+              value={post.subtitle || ''}
+              onChange={(e) => updateField(post.id, 'subtitle', e.target.value)}
+              className="focus:ring-primary-500 mb-4 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+            />
+
+            <label
               htmlFor={`summary-${post.id}`}
               className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
             >
@@ -257,7 +271,7 @@ export default function ManagePostsPage() {
                   alt={`Imagem atual de ${post.title}`}
                   width={320}
                   height={180}
-                  className="h-auto w-full max-w-xs rounded-md object-cover"
+                  className="aspect-video w-full max-w-xs rounded-md object-cover"
                 />
               </div>
             )}
