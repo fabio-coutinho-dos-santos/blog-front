@@ -9,6 +9,7 @@ import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
 import SectionContainer from '@/components/SectionContainer'
+import { getHeaderNavLinks } from '@/data/headerNavLinks'
 import Footer from '@/components/Footer'
 // import CareerChatWidget from '@/components/CareerChatWidget'
 import siteMetadata from '@/data/siteMetadata'
@@ -102,7 +103,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
           <SectionContainer>
             <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
-              <Header />
+              <Header links={getHeaderNavLinks()} />
               <main className="mb-auto">{children}</main>
               {/* <CareerChatWidget /> */}
             </SearchProvider>
