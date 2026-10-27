@@ -1,53 +1,78 @@
 ---
 name: Fabio Coutinho dos Santos
 avatar: https://r2-cdn.procode-tech.com/images/profile-photo.png
-occupation: Engenheiro de Software Sênior | Engenharia de Plataforma e Infraestrutura
-company: Skeelo
+occupation: Engenheiro de Software
+company: Skeelo · Foundations
 email: fabio_santcou@hotmail.com
 linkedin: https://www.linkedin.com/in/fabiocoutinhosantos
 github: https://github.com
 ---
 
-## Construindo Sistemas Confiáveis Onde Escala Encontra Simplicidade
+## Sistemas confiáveis, decisões explícitas
 
-Sou Fabio, Engenheiro de Software Sênior no Brasil, com mais de 10 anos de experiência construindo sistemas backend, plataformas distribuídas e infraestrutura em nuvem para SaaS, HR Tech, Betting, IoT e Conteúdo Digital.
+Sou Fabio, engenheiro de software sênior no Brasil. Trabalho com desenvolvimento desde 2017, construindo backends, arquiteturas distribuídas e infraestrutura em nuvem para produtos de SaaS, HR Tech, IoT e conteúdo digital.
 
-Hoje, meu trabalho está na interseção entre **arquitetura backend**, **engenharia de plataforma** e **modernização de infraestrutura**. Gosto de resolver problemas técnicos complexos, especialmente os que impactam múltiplos times e exigem execução prática e pensamento arquitetural.
+Minha base é backend e arquitetura de software: modelar domínios, desenhar serviços, quebrar monólitos e escolher os trade-offs certos para cada contexto. Nos últimos anos, levei essa base para a plataforma. Hoje faço parte do time de **Foundations** do Skeelo, responsável pela infraestrutura que os outros times usam para construir e operar seus produtos.
 
-## No Que Eu Foco
+Essa passagem pelos dois lados moldou como eu trabalho. Como dev, sei o que um time de produto precisa da plataforma. Na plataforma, sei que uma boa arquitetura de aplicação evita metade dos problemas de operação.
 
-- Projetar backends escaláveis com Node.js, TypeScript e NestJS
-- Evoluir monólitos para arquiteturas modulares e baseadas em microservices
-- Construir plataformas cloud-native em GCP e AWS
-- Habilitar entregas mais seguras e rápidas com CI/CD e padrões de engenharia
-- Melhorar observabilidade com logs, métricas, traces e sinais acionáveis
+Os problemas de que mais gosto são os que atravessam vários times: migrações que não podem parar o produto, padrões que precisam ser adotados por dezenas de serviços e falhas que só aparecem em produção.
 
-## Impactos Selecionados
+## No que eu foco
 
-- Liderei iniciativas backend que melhoraram fluxos de onboarding e engajamento, contribuindo para crescimento de ativação e leitura.
-- Apoiei a evolução da plataforma de ambientes legados centrados em VM para estratégias cloud-native.
-- Propus e implementei abordagens de staging multiambiente para melhorar isolamento e confiança em releases.
-- Padronizei práticas de ambientes e deploy em dezenas de serviços backend.
-- Liderei migrações de padrões legados de armazenamento de arquivos para object storage com estratégias regionais orientadas a compliance para usuários europeus.
+- Projetar backends escaláveis e fáceis de manter com Node.js, TypeScript e NestJS
+- Modelar domínios e organizar serviços com DDD, Clean Architecture e SOLID
+- Evoluir monólitos para arquiteturas modulares e microsserviços, sem parar o produto
+- Documentar arquitetura com diagramas C4, ADRs e RFCs
+- Construir plataformas cloud-native em AWS, GCP e Cloudflare
+- Melhorar observabilidade, segurança e a forma como os times entregam
 
-## Filosofia de Engenharia
+## Arquitetura e backend
 
-Acredito que grandes sistemas são construídos quando **clareza, qualidade e colaboração** caminham juntas:
+- **Padrões de arquitetura no Skeelo.** Conduzi a definição de padrões para a migração de um monólito JavaScript para microsserviços em TypeScript e NestJS: arquitetura interna dos serviços, critérios objetivos para adoção de Clean Architecture e estratégia de migração, tudo registrado em ADRs e RFCs revisadas com o CTO.
+- **Documentação de arquitetura.** Estou construindo os diagramas C4 (contexto e contêineres) dos serviços do Skeelo, versionados no repositório de arquitetura, para que qualquer pessoa entenda o sistema sem depender de quem o construiu.
+- **Reescrita de checkout.** Defini a arquitetura e liderei tecnicamente a reescrita do backend de checkout de um monólito Laravel para Node.js com NestJS. Em produção, o tempo de resposta caiu de cerca de 500 ms para 250 ms.
+- **De monólito a microsserviços.** Desenhei a solução, a modelagem de dados e a documentação de um novo produto, e refatorei um backend monolítico para microsserviços na AWS, com requisitos e arquitetura documentados em C4 e um microsserviço de autenticação com OAuth2.
+- **Liderança técnica.** Como tech lead, desenhei a arquitetura e liderei squads de dois produtos novos, incluindo soluções com LLMs: RAG, busca semântica com embeddings e pgvector, integrando Python (FastAPI) e Node.js.
+- **Produto.** No Skeelo, liderei o backend de fluxos de onboarding e engajamento que contribuíram para um aumento de cerca de 68% em resgates de livros e inícios de leitura.
 
-- `Clareza` em arquitetura e trade-offs
-- `Qualidade` em código, testes e operações
-- `Colaboração` entre times de produto, engenharia e plataforma
+Em todos esses projetos, a base foi a mesma: Clean Architecture, SOLID, DDD tático, padrões de projeto onde fazem sentido (Builder, Factory, Facade, entre outros), testes unitários e de integração e APIs documentadas.
 
-É assim que construímos software que escala não só tecnicamente, mas também organizacionalmente.
+## Plataforma e infraestrutura
 
-## Stack Principal
+- **Do FTP ao object storage.** Conduzi a migração de 40 TB de arquivos de um servidor FTP legado para o Cloudflare R2, em 18 aplicações e sem incidentes relevantes. O projeto incluiu uma biblioteca de storage compartilhada por todos os serviços, buckets separados por nível de risco, URLs assinadas para conteúdo privado e um bucket com jurisdição restrita à União Europeia para dados de usuários europeus. Apresentei essa migração no meetup interno de engenharia.
+- **Migração para Kubernetes.** Ajudo a conduzir a virada das aplicações para AWS (EKS), com infraestrutura como código em Terraform e Terragrunt e liberações progressivas (canary) através de API gateway.
+- **Ambientes de staging isolados.** Propus e implementei ambientes de staging por squad no Google Cloud Run, com roteamento por header. Também desenhei a camada de storage desses ambientes: leitura com fallback para os dados de produção, sem duplicar 40 TB, e escrita sempre isolada.
+- **Segurança.** Implantei secret scanning em toda a organização (Gitleaks e TruffleHog), no CI e em hooks locais.
 
-`Node.js` · `TypeScript` · `NestJS` · `GCP (Cloud Run, Pub/Sub)` · `AWS` · `Cloudflare R2` · `Kafka` · `Redis` · `PostgreSQL` · `Docker` · `Kubernetes` · `CI/CD`
+## Como eu trabalho
 
-## Formação Acadêmica e Técnica
+- **Decisão de arquitetura se escreve.** Trade-off que não está documentado vira discussão repetida.
+- **Preservar contratos antes de reescrever.** A melhor migração é a que o resto do sistema nem percebe.
+- **Medir antes de otimizar.** Sem número de antes e depois, melhoria é opinião.
+- **A solução mais simples que resolve.** Cada sistema novo é algo que alguém vai precisar manter.
+- **Conhecimento concentrado é risco.** Bom trabalho técnico vira documentação, padrão ou ferramenta que outros times usam sem depender de mim.
 
-Tenho **Mestrado em Ciência da Computação** e **Bacharelado em Engenharia de Computação** pela PUC Minas, com pesquisas publicadas em segurança para IoT e sistemas distribuídos, incluindo trabalhos sobre impacto de performance em aplicações IoT multiplataforma e arquiteturas de detecção de ataques.
+## Sobre o que escrevo
 
-## Próximos Passos
+Arquitetura de software, resiliência em sistemas distribuídos, bancos de dados, migrações de infraestrutura e as decisões por trás de cada escolha. Escrevo sobre o que aprendo resolvendo problemas reais, incluindo o que deu errado no caminho.
 
-Atualmente estou focado em oportunidades de alto impacto em nível **Senior/Staff** em Engenharia de Plataforma, Arquitetura em Nuvem e Sistemas Distribuídos, idealmente em ambientes remotos e internacionais, onde eu possa ajudar times a entregar sistemas melhores em escala.
+## Stack e práticas
+
+**Linguagens e frameworks:** `Node.js` · `TypeScript` · `NestJS` · `Go (estudando)` · `Python` · `C` · `PHP / Laravel`
+
+**Dados e mensageria:** `PostgreSQL` · `MySQL` · `MongoDB` · `Redis` · `Kafka` · `RabbitMQ`
+
+**Cloud e plataforma:** `AWS (EKS, S3, EFS, Transfer Family)` · `GCP (Cloud Run, Pub/Sub)` · `Cloudflare R2` · `Docker` · `Kubernetes` · `Helm` · `Terraform / Terragrunt` · `ArgoCD` · `Kong` · `OpenBao` · `CI/CD`
+
+**Arquitetura e práticas:** `Clean Architecture` · `DDD` · `SOLID` · `Design Patterns` · `Microsserviços` · `Arquitetura orientada a eventos` · `C4 Model` · `ADRs / RFCs` · `Testes automatizados` · `Observabilidade`
+
+**Estudando agora:** Go (este blog é escrito em Go), observabilidade com Grafana e sistemas de dados distribuídos.
+
+## Formação
+
+Mestrado em Ciência da Computação e bacharelado em Engenharia de Computação pela PUC Minas, com pesquisas publicadas em segurança para IoT e sistemas distribuídos, incluindo impacto de performance em aplicações IoT multiplataforma e arquiteturas de detecção de ataques.
+
+## Contato
+
+Quer conversar sobre arquitetura, backend, plataforma ou algum post daqui? Me encontre no [LinkedIn](https://www.linkedin.com/in/fabiocoutinhosantos).

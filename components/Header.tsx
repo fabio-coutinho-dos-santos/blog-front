@@ -33,7 +33,7 @@ const Header = ({ links }: { links: NavLink[] }) => {
             <div className="hidden sm:block">
               <div className="h-6 text-2xl font-semibold">{siteMetadata.headerTitle}</div>
               <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                Engenheiro de Software Sênior
+                Engenheiro de Software
               </div>
             </div>
           ) : (

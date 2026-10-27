@@ -1,4 +1,6 @@
 // adminOnly: shown only when logged in (the Header checks that in the browser)
+import { isProductionEnvironment } from 'app/lib/environment'
+
 export type NavLink = { href: string; title: string; adminOnly?: boolean }
 
 const headerNavLinks: NavLink[] = [
@@ -20,6 +22,6 @@ const PRODUCTION_LINKS = ['/blog', '/about']
 // the result down as props. NODE_ENV is not used on purpose: `next build` / `next start`
 // always set it to "production", even when running locally.
 export function getHeaderNavLinks(environment = process.env.ENVIRONMENT): NavLink[] {
-  if (environment?.trim().toLowerCase() !== 'production') return headerNavLinks
+  if (!isProductionEnvironment(environment)) return headerNavLinks
   return headerNavLinks.filter((link) => PRODUCTION_LINKS.includes(link.href))
 }
