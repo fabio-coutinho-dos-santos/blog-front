@@ -17,6 +17,20 @@ function exportUrl(src: string) {
   return src.replace(/\.dzi(\?.*)?$/i, '.png')
 }
 
+// Big maps are published twice: the plain PNG and Deep Zoom tiles next to it
+// (<name>.dzi + <name>_files/). Phones cannot decode a 268 MP PNG (the tab crashes), so use
+// the tiles whenever they exist and keep the PNG as the fallback.
+async function resolveSource(src: string) {
+  if (/\.dzi(\?.*)?$/i.test(src)) return src
+  const dzi = src.replace(/\.(png|jpe?g|webp)(\?.*)?$/i, '.dzi')
+  try {
+    const response = await fetch(dzi, { method: 'HEAD' })
+    return response.ok ? dzi : src
+  } catch {
+    return src
+  }
+}
+
 // Full-page pan/zoom viewer for big diagrams (mind maps, architecture maps), opened from
 // a link in a post (app/viewer). Read-only: navigation + export, nothing to edit.
 export default function ZoomImageViewer({ src, title }: Props) {
@@ -32,47 +46,49 @@ export default function ZoomImageViewer({ src, title }: Props) {
     let destroyed = false
     let viewer: OpenSeadragon.Viewer | null = null
 
-    import('openseadragon').then(({ default: OSD }) => {
-      if (destroyed || !canvasRef.current) return
+    Promise.all([import('openseadragon'), resolveSource(src)]).then(
+      ([{ default: OSD }, source]) => {
+        if (destroyed || !canvasRef.current) return
 
-      const isDzi = /\.dzi(\?.*)?$/i.test(src)
-      viewer = OSD({
-        element: canvasRef.current,
-        // ImageTileSource options (type 'image') are missing from @types/openseadragon
-        tileSources: isDzi
-          ? src
-          : ({
-              type: 'image',
-              url: src,
-              buildPyramid: false,
-            } as unknown as OpenSeadragon.TileSourceOptions),
-        // canvas drawer: a single big image can't be a WebGL texture (max ~16k px per side)
-        drawer: 'canvas',
-        crossOriginPolicy: 'Anonymous',
-        showNavigationControl: false,
-        showNavigator: true,
-        navigatorPosition: 'BOTTOM_RIGHT',
-        navigatorAutoFade: false,
-        navigatorBackground: 'transparent',
-        visibilityRatio: 0.3,
-        minZoomImageRatio: 0.5,
-        maxZoomPixelRatio: 2,
-        gestureSettingsMouse: { clickToZoom: false, dblClickToZoom: true, scrollToZoom: true },
-        gestureSettingsTouch: { pinchToZoom: true, flickEnabled: true },
-      })
+        const isDzi = /\.dzi(\?.*)?$/i.test(source)
+        viewer = OSD({
+          element: canvasRef.current,
+          // ImageTileSource options (type 'image') are missing from @types/openseadragon
+          tileSources: isDzi
+            ? source
+            : ({
+                type: 'image',
+                url: source,
+                buildPyramid: false,
+              } as unknown as OpenSeadragon.TileSourceOptions),
+          // canvas drawer: a single big image can't be a WebGL texture (max ~16k px per side)
+          drawer: 'canvas',
+          crossOriginPolicy: 'Anonymous',
+          showNavigationControl: false,
+          showNavigator: true,
+          navigatorPosition: 'BOTTOM_RIGHT',
+          navigatorAutoFade: false,
+          navigatorBackground: 'transparent',
+          visibilityRatio: 0.3,
+          minZoomImageRatio: 0.5,
+          maxZoomPixelRatio: 2,
+          gestureSettingsMouse: { clickToZoom: false, dblClickToZoom: true, scrollToZoom: true },
+          gestureSettingsTouch: { pinchToZoom: true, flickEnabled: true },
+        })
 
-      viewer.addHandler('open', () => {
-        if (!viewer) return
-        // Tall maps: start fitted to the width, at the top (the whole map would be a thin strip)
-        viewer.viewport.fitHorizontally(true)
-        const bounds = viewer.viewport.getBounds(true)
-        viewer.viewport.panTo(new OSD.Point(0.5, bounds.height / 2), true)
-        setStatus('ready')
-      })
-      viewer.addHandler('open-failed', () => setStatus('error'))
+        viewer.addHandler('open', () => {
+          if (!viewer) return
+          // Tall maps: start fitted to the width, at the top (the whole map would be a thin strip)
+          viewer.viewport.fitHorizontally(true)
+          const bounds = viewer.viewport.getBounds(true)
+          viewer.viewport.panTo(new OSD.Point(0.5, bounds.height / 2), true)
+          setStatus('ready')
+        })
+        viewer.addHandler('open-failed', () => setStatus('error'))
 
-      viewerRef.current = viewer
-    })
+        viewerRef.current = viewer
+      }
+    )
 
     return () => {
       destroyed = true

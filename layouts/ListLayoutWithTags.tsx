@@ -160,8 +160,12 @@ export default function ListLayoutWithTags({
               const isCompleted = status === 'completed'
               return (
                 <li key={id} className="py-8">
-                  <article className="grid grid-cols-1 gap-6 sm:grid-cols-[minmax(0,1fr)_400px] sm:items-center">
-                    <div className="space-y-4">
+                  <article
+                    className={`relative grid grid-cols-1 gap-6 sm:grid-cols-[minmax(0,1fr)_400px] sm:items-center ${
+                      path && isCompleted ? 'cursor-pointer' : ''
+                    }`}
+                  >
+                    <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]">
                       <dl>
                         <dt className="sr-only">Publicado em</dt>
                         <dd className="text-base leading-6 font-medium text-gray-500 dark:text-gray-400">
@@ -173,7 +177,11 @@ export default function ListLayoutWithTags({
                       <div>
                         <h2 className="text-2xl leading-8 font-bold tracking-tight">
                           {path && isCompleted ? (
-                            <Link href={`/${path}`} className="text-gray-900 dark:text-gray-100">
+                            <Link
+                              href={`/${path}`}
+                              // stretched link: the ::after covers the whole article, so a click anywhere opens the post
+                              className="text-gray-900 after:absolute after:inset-0 after:content-[''] dark:text-gray-100"
+                            >
                               {title}
                             </Link>
                           ) : (
@@ -181,7 +189,7 @@ export default function ListLayoutWithTags({
                           )}
                         </h2>
                         {isAuthenticated && !isProduction && pathname.startsWith('/blog') && (
-                          <div className="mt-3">
+                          <div className="relative z-10 mt-3 w-fit">
                             <Link
                               href={`/admin/manage-posts?postId=${id}`}
                               className="bg-primary-500 hover:bg-primary-600 inline-flex rounded-md px-3 py-1.5 text-xs font-semibold text-white"
@@ -244,7 +252,7 @@ export default function ListLayoutWithTags({
                               key={`${id}-${tag}`}
                               type="button"
                               onClick={() => filterByTag(tag)}
-                              className="text-primary-500 hover:bg-primary-500/10 rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold tracking-wide uppercase transition-colors dark:border-gray-700"
+                              className="text-primary-500 hover:bg-primary-500/10 relative z-10 cursor-pointer rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold tracking-wide uppercase transition-colors dark:border-gray-700"
                               aria-label={`Filter posts by ${tag}`}
                             >
                               {tag}
@@ -254,13 +262,13 @@ export default function ListLayoutWithTags({
                       )}
                     </div>
                     {imageUrl && (
-                      <div className="sm:justify-self-end">
+                      <div className="min-w-0 sm:justify-self-end">
                         <Image
                           src={imageUrl}
                           alt={title}
                           width={400}
                           height={240}
-                          className="h-[240px] w-full max-w-[400px] rounded-lg object-cover shadow-sm"
+                          className="h-auto max-h-[240px] min-h-[180px] w-full max-w-full rounded-lg object-cover shadow-sm sm:h-[240px] sm:max-w-[400px]"
                         />
                       </div>
                     )}
