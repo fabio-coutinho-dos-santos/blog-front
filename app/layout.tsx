@@ -1,12 +1,10 @@
 import 'css/tailwind.css'
 // Syntax highlighting colors for code blocks in posts (rehype-prism-plus)
 import 'css/prism.css'
-import 'pliny/search/algolia.css'
 import 'remark-github-blockquote-alert/alert.css'
 
 import { Space_Grotesk } from 'next/font/google'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
-import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
 import SectionContainer from '@/components/SectionContainer'
 import { getHeaderNavLinks } from '@/data/headerNavLinks'
@@ -105,11 +103,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ThemeProviders>
             <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
             <SectionContainer>
-              <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
-                <Header links={getHeaderNavLinks()} />
-                <main className="mb-auto">{children}</main>
-                {/* <CareerChatWidget /> */}
-              </SearchProvider>
+              <Header links={getHeaderNavLinks()} />
+              <main className="mb-auto">{children}</main>
+              {/* <CareerChatWidget /> */}
               <Footer />
             </SectionContainer>
           </ThemeProviders>
